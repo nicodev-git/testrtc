@@ -1,0 +1,8 @@
+Followed https://www.twilio.com/docs/video/javascript-getting-started
+which is... not saying much.
+https://github.com/twilio/twilio-video-app-react/blob/master/server.js is useful (from https://www.twilio.com/docs/video/tutorials/user-identity-access-tokens)
+
+https://www.twilio.com/docs/video/tutorials/understanding-video-rooms#ad-hoc-rooms -- do this.
+
+Note: https://www.twilio.com/docs/video/tutorials/working-with-vp8-simulcast#whats-simulcast -- needs to be enabled, not by default
+No mention of resolution-adaptivity...

@@ -1,0 +1,22 @@
+{
+  "name": "twilio-group-thing",
+  "version": "1.0.0",
+  "description": "lets see how horrible their sdk is",
+  "private": "true",
+  "main": "index.js",
+  "scripts": {
+    "build": "browserify src/main.js -o build/main.js",
+    "test": "eslint server.js src/",
+    "start": "npm run build && node server"
+  },
+  "author": "fippo",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "browserify": "^16.5.1",
+    "eslint": "^7.3.1",
+    "express": "^4.17.1",
+    "twilio": "^3.46.0",
+    "twilio-video": "^2.5.0",
+    "uuid": "^8.2.0"
+  }
+}
