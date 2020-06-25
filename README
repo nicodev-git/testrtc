@@ -6,3 +6,6 @@ https://www.twilio.com/docs/video/tutorials/understanding-video-rooms#ad-hoc-roo
 
 Note: https://www.twilio.com/docs/video/tutorials/working-with-vp8-simulcast#whats-simulcast -- needs to be enabled, not by default
 No mention of resolution-adaptivity...
+
+
+http://localhost:8081/token?identity=6e68500b-4fe2-478a-82ad-4a683d76940c&roomName=room

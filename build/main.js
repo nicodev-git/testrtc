@@ -783,38 +783,27 @@ function standardizeFirefoxStats(response, isRemote) {
 module.exports = getStats;
 
 },{"./util":16,"./util/sdp":18}],2:[function(require,module,exports){
+/* globals navigator */
 'use strict';
 
 /**
- * This function is very similar to <code>navigator.getUserMedia</code> except
- * that it does not use callbacks and returns a Promise for a MediaStream
+ * This function is very similar to <code>navigator.mediaDevices.getUserMedia</code>
+ * except that if no MediaStreamConstraints are provided, then bot audio and video
+ * are requested.
  * @function getUserMedia
  * @param {MediaStreamConstraints} [constraints={audio:true,video:true}] - the
- *   MediaStreamConstraints object specifying what kind of LocalMediaStream to
+ *   MediaStreamConstraints object specifying what kind of MediaStream to
  *   request from the browser (by default both audio and video)
  * @returns Promise<MediaStream>
  */
 function getUserMedia(constraints) {
-  return new Promise(function getUserMediaPromise(resolve, reject) {
-    _getUserMedia(constraints || { audio: true, video: true }, resolve, reject);
-  });
-}
-
-function _getUserMedia(constraints, onSuccess, onFailure) {
-  if (typeof window !== 'undefined' && typeof navigator !== 'undefined') {
-    if (typeof navigator.mediaDevices === 'object' &&
-        typeof navigator.mediaDevices.getUserMedia === 'function') {
-      navigator.mediaDevices.getUserMedia(constraints).then(onSuccess, onFailure);
-      return;
-    } else if (typeof navigator.webkitGetUserMedia === 'function') {
-      navigator.webkitGetUserMedia(constraints, onSuccess, onFailure);
-      return;
-    } else if (typeof navigator.mozGetUserMedia === 'function') {
-      navigator.mozGetUserMedia(constraints, onSuccess, onFailure);
-      return;
-    }
+  if (typeof navigator === 'object'
+    && typeof navigator.mediaDevices === 'object'
+    && typeof navigator.mediaDevices.getUserMedia === 'function') {
+    constraints = constraints || { audio: true, video: true };
+    return navigator.mediaDevices.getUserMedia(constraints);
   }
-  onFailure(new Error('getUserMedia is not supported'));
+  return Promise.reject(new Error('getUserMedia is not supported'));
 }
 
 module.exports = getUserMedia;
@@ -865,11 +854,11 @@ module.exports = WebRTC;
 /* globals MediaStream */
 'use strict';
 
-if (typeof MediaStream !== 'undefined') {
+if (typeof MediaStream === 'function') {
   module.exports = MediaStream;
 } else {
   module.exports = function MediaStream() {
-    throw new Error('WebRTC is not supported in this browser');
+    throw new Error('MediaStream is not supported');
   };
 }
 
@@ -877,25 +866,23 @@ if (typeof MediaStream !== 'undefined') {
 /* global MediaStreamTrack */
 'use strict';
 
-if (typeof MediaStreamTrack !== 'undefined') {
+if (typeof MediaStreamTrack === 'function') {
   module.exports = MediaStreamTrack;
 } else {
   module.exports = function MediaStreamTrack() {
-    throw new Error('WebRTC is not supported in this browser');
+    throw new Error('MediaStreamTrack is not supported');
   };
 }
 
 },{}],6:[function(require,module,exports){
-/* global mozRTCIceCandidate, RTCIceCandidate */
+/* global RTCIceCandidate */
 'use strict';
 
-if (typeof RTCIceCandidate !== 'undefined') {
+if (typeof RTCIceCandidate === 'function') {
   module.exports = RTCIceCandidate;
-} else if (typeof mozRTCIceCandidate !== 'undefined') {
-  module.exports = mozRTCIceCandidate;
 } else {
   module.exports = function RTCIceCandidate() {
-    throw new Error('WebRTC is unsupported');
+    throw new Error('RTCIceCandidate is not supported');
   };
 }
 
@@ -1758,7 +1745,7 @@ module.exports = FirefoxRTCPeerConnection;
 },{"../rtcsessiondescription/firefox":13,"../util":16,"../util/eventtarget":15,"../util/sdp":18,"util":164}],9:[function(require,module,exports){
 'use strict';
 
-if (typeof RTCPeerConnection !== 'undefined') {
+if (typeof RTCPeerConnection === 'function') {
   var guessBrowser = require('../util').guessBrowser;
   switch (guessBrowser()) {
     case 'chrome':
@@ -1772,7 +1759,12 @@ if (typeof RTCPeerConnection !== 'undefined') {
       break;
     default:
       module.exports = RTCPeerConnection;
+      break;
   }
+} else {
+  module.exports = function RTCPeerConnection() {
+    throw new Error('RTCPeerConnection is not supported');
+  };
 }
 
 },{"../util":16,"./chrome":7,"./firefox":8,"./safari":10}],10:[function(require,module,exports){
@@ -2251,27 +2243,30 @@ module.exports = ChromeRTCSessionDescription;
 },{}],13:[function(require,module,exports){
 /* globals RTCSessionDescription */
 'use strict';
-module.exports = typeof RTCSessionDescription !== 'undefined'
-  ? RTCSessionDescription
-  : window.mozRTCSessionDescription;
+
+module.exports = RTCSessionDescription;
 
 },{}],14:[function(require,module,exports){
+/* globals RTCSessionDescription */
 'use strict';
 
-var guessBrowser = require('../util').guessBrowser;
-
-switch (guessBrowser()) {
-  case 'chrome':
-    module.exports = require('./chrome');
-    break;
-  case 'firefox':
-    module.exports = require('./firefox');
-    break;
-  default:
-    if (typeof RTCSessionDescription === 'undefined') {
+if (typeof RTCSessionDescription === 'function') {
+  var guessBrowser = require('../util').guessBrowser;
+  switch (guessBrowser()) {
+    case 'chrome':
+      module.exports = require('./chrome');
       break;
-    }
-    module.exports = RTCSessionDescription;
+    case 'firefox':
+      module.exports = require('./firefox');
+      break;
+    default:
+      module.exports = RTCSessionDescription;
+      break;
+  }
+} else {
+  module.exports = function RTCSessionDescription() {
+    throw new Error('RTCSessionDescription is not supported');
+  };
 }
 
 },{"../util":16,"./chrome":12,"./firefox":13}],15:[function(require,module,exports){
@@ -2591,6 +2586,17 @@ function proxyProperty(source, wrapper, target, propertyName) {
 }
 
 /**
+ * Check whether native WebRTC APIs are supported.
+ * @returns {boolean}
+ */
+function support() {
+  return typeof navigator === 'object'
+    && typeof navigator.mediaDevices === 'object'
+    && typeof navigator.mediaDevices.getUserMedia === 'function'
+    && typeof RTCPeerConnection === 'function';
+}
+
+/**
  * @typedef {object} Deferred
  * @property {Promise} promise
  * @property {function} reject
@@ -2607,6 +2613,7 @@ exports.interceptEvent = interceptEvent;
 exports.legacyPromise = legacyPromise;
 exports.makeUUID = makeUUID;
 exports.proxyProperties = proxyProperties;
+exports.support = support;
 
 },{}],17:[function(require,module,exports){
 'use strict';
@@ -3035,54 +3042,41 @@ exports.updateUnifiedPlanTrackIdsToSSRCs = updateUnifiedPlanTrackIdsToSSRCs;
 
 },{"./":16}],19:[function(require,module,exports){
 module.exports={
-  "_from": "@twilio/webrtc@4.2.1",
-  "_id": "@twilio/webrtc@4.2.1",
-  "_inBundle": false,
-  "_integrity": "sha512-JoJ+q3Zf0jWbn2yFjLu+C068+lw4A12507UnxTbQTGBg0mcCqC3msjl5dkJgXMc6hS48nICAGEPvTrEOUB7YBA==",
-  "_location": "/@twilio/webrtc",
-  "_phantomChildren": {},
-  "_requested": {
-    "type": "version",
-    "registry": true,
-    "raw": "@twilio/webrtc@4.2.1",
-    "name": "@twilio/webrtc",
-    "escapedName": "@twilio%2fwebrtc",
-    "scope": "@twilio",
-    "rawSpec": "4.2.1",
-    "saveSpec": null,
-    "fetchSpec": "4.2.1"
+  "name": "@twilio/webrtc",
+  "version": "4.3.0",
+  "description": "WebRTC-related APIs and shims used by twilio-video.js",
+  "scripts": {
+    "build": "npm-run-all clean lint test",
+    "clean": "rimraf coverage",
+    "lint": "eslint ./lib",
+    "test:unit": "istanbul cover node_modules/mocha/bin/_mocha -- ./test/unit/index.js",
+    "test:integration:native": "karma start karma/integration.conf.js",
+    "test:integration:adapter": "karma start karma/integration.adapter.conf.js",
+    "test:integration": "npm-run-all test:integration:*",
+    "test": "npm-run-all test:*"
   },
-  "_requiredBy": [
-    "/twilio-video"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/twilio/twilio-webrtc.js.git"
+  },
+  "keywords": [
+    "shim",
+    "twilio",
+    "video",
+    "webrtc"
   ],
-  "_resolved": "https://registry.npmjs.org/@twilio/webrtc/-/webrtc-4.2.1.tgz",
-  "_shasum": "2e6f9555190335a66581b64e9b48f5917c58f387",
-  "_spec": "@twilio/webrtc@4.2.1",
-  "_where": "/media/fippo/houseparty/opentok/twilio/node_modules/twilio-video",
-  "author": {
-    "name": "Manjesh Malavalli",
-    "email": "mmalavalli@twilio.com"
-  },
+  "author": "Manjesh Malavalli <mmalavalli@twilio.com>",
+  "contributors": [
+    "Mark Roberts <mroberts@twilio.com>",
+    "Ryan Rowland <rrowland@twilio.com>",
+    "Makarand Patwardhan <mpatwardhan@twilio.com>"
+  ],
+  "license": "BSD-3-Clause",
+  "main": "./lib/index.js",
   "bugs": {
     "url": "https://github.com/twilio/twilio-webrtc.js/issues"
   },
-  "bundleDependencies": false,
-  "contributors": [
-    {
-      "name": "Mark Roberts",
-      "email": "mroberts@twilio.com"
-    },
-    {
-      "name": "Ryan Rowland",
-      "email": "rrowland@twilio.com"
-    },
-    {
-      "name": "Makarand Patwardhan",
-      "email": "mpatwardhan@twilio.com"
-    }
-  ],
-  "deprecated": false,
-  "description": "WebRTC-related APIs and shims used by twilio-video.js",
+  "homepage": "https://github.com/twilio/twilio-webrtc.js#readme",
   "devDependencies": {
     "browserify": "^14.4.0",
     "electron": "^5.0.0",
@@ -3103,38 +3097,13 @@ module.exports={
     "karma-spec-reporter": "0.0.31",
     "mocha": "^3.5.0",
     "npm-run-all": "^4.0.2",
-    "rimraf": "^2.6.1",
-    "simple-git": "^2.4.0",
-    "travis-multirunner": "^4.2.3",
     "twilio-release-tool": "^1.0.0",
+    "rimraf": "^2.6.1",
+    "travis-multirunner": "^4.2.3",
+    "simple-git": "^2.4.0",
     "watchify": "^3.9.0",
     "webrtc-adapter": "^6.4.8"
-  },
-  "homepage": "https://github.com/twilio/twilio-webrtc.js#readme",
-  "keywords": [
-    "shim",
-    "twilio",
-    "video",
-    "webrtc"
-  ],
-  "license": "BSD-3-Clause",
-  "main": "./lib/index.js",
-  "name": "@twilio/webrtc",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/twilio/twilio-webrtc.js.git"
-  },
-  "scripts": {
-    "build": "npm-run-all clean lint test",
-    "clean": "rimraf coverage",
-    "lint": "eslint ./lib",
-    "test": "npm-run-all test:*",
-    "test:integration": "npm-run-all test:integration:*",
-    "test:integration:adapter": "karma start karma/integration.adapter.conf.js",
-    "test:integration:native": "karma start karma/integration.conf.js",
-    "test:unit": "istanbul cover node_modules/mocha/bin/_mocha -- ./test/unit/index.js"
-  },
-  "version": "4.2.1"
+  }
 }
 
 },{}],20:[function(require,module,exports){
@@ -20582,6 +20551,9 @@ function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var _require = require('@twilio/webrtc/lib/util'),
+    guessBrowser = _require.guessBrowser;
+
 var IceReportFactory = require('./icereportfactory');
 var PeerConnectionReport = require('./peerconnectionreport');
 var ReceiverReportFactory = require('./receiverreportfactory');
@@ -20677,7 +20649,7 @@ var PeerConnectionReportFactory = function () {
     value: function next() {
       var _this = this;
 
-      var updatePromise = typeof mozRTCPeerConnection !== 'undefined' ? updateFirefox(this) : updateChrome(this);
+      var updatePromise = guessBrowser() === 'firefox' ? updateFirefox(this) : updateChrome(this);
 
       return updatePromise.then(function () {
         var audioSenderReportFactories = [].concat(_toConsumableArray(_this.audio.send.values()));
@@ -20879,7 +20851,7 @@ function updateSenderReports(factory, report, senderReportFactoryIdsToDeleteByMe
       var stats = _step2.value;
 
       if (stats.type === 'outbound-rtp' && !stats.isRemote) {
-        if (typeof mozRTCPeerConnection === 'undefined' && !stats.trackId) {
+        if (guessBrowser() !== 'firefox' && !stats.trackId) {
           continue;
         }
         var senderReportFactoryIdsToDelete = senderReportFactoryIdsToDeleteByMediaType[stats.mediaType];
@@ -21039,7 +21011,7 @@ function updateIceReport(ice, report) {
 
 /**
  * @param {PeerConnectionReportFactory} factory
- * @returns {PeerConnectionReport}
+ * @returns {Promise<PeerConnectionReport>}
  */
 function updateFirefox(factory) {
   var senders = factory.pc.getTransceivers().filter(function (transceiver) {
@@ -21080,7 +21052,7 @@ function updateFirefox(factory) {
 
 /**
  * @param {PeerConnectionReportFactory} factory
- * @returns {PeerConnectionReport}
+ * @returns {Promise<PeerConnectionReport>}
  */
 function updateChrome(factory) {
   return factory.pc.getStats().then(function (report) {
@@ -21099,7 +21071,7 @@ function updateChrome(factory) {
 }
 
 module.exports = PeerConnectionReportFactory;
-},{"./icereportfactory":106,"./peerconnectionreport":120,"./receiverreportfactory":123,"./senderreportfactory":130}],122:[function(require,module,exports){
+},{"./icereportfactory":106,"./peerconnectionreport":120,"./receiverreportfactory":123,"./senderreportfactory":130,"@twilio/webrtc/lib/util":16}],122:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -21964,7 +21936,7 @@ var nInstances = 0;
     | | | --------------------|------------------ |
     | v | |                   v                   |
   +----------+           +--------+               |
-  | waiting  |           |  open  | ---------------
+  | waiting  | --------> |  open  | ---------------
   +----------+           +--------+
  */
 
@@ -21973,7 +21945,7 @@ var states = {
   connecting: ['closed', 'open', 'waiting'],
   early: ['closed', 'connecting'],
   open: ['closed'],
-  waiting: ['closed', 'connecting', 'early']
+  waiting: ['closed', 'connecting', 'early', 'open']
 };
 
 var events = {
@@ -22263,8 +22235,8 @@ var TwilioConnection = function (_StateMachine) {
             break;
           case 'msg':
             _this2._handleMessage(message);
-          // Each incoming message should be treated as an incoming heartbeat
-          // intentionally falling through to 'heartbeat' case.
+          // NOTE(mpatwardhan): Each incoming message should be treated as an incoming
+          // heartbeat intentionally falling through to 'heartbeat' case.
           // eslint-disable-next-line no-fallthrough
           case 'heartbeat':
             _this2._handleHeartbeat();
@@ -22426,18 +22398,21 @@ var TwilioConnection = function (_StateMachine) {
 
       var negotiatedTimeout = _ref5.negotiatedTimeout;
 
-      if (this.state !== 'connecting') {
-        this._log.warn('Unexpected state "' + this.state + '" for handling a "welcome"' + ' message from the TCMP server.');
+      var log = this._log;
+
+      if (!['connecting', 'waiting'].includes(this.state)) {
+        log.warn('Unexpected state "' + this.state + '" for handling a "welcome"' + ' message from the TCMP server.');
         return;
+      }
+
+      if (this.state === 'waiting') {
+        log.debug('Received "welcome" message, no need to retry connection.');
+        this._busyWaitTimeout.clear();
       }
 
       var maxConsecutiveMissedHeartbeats = this._options.maxConsecutiveMissedHeartbeats;
 
-      // NOTE(mpatwardhan): Wait for 3 missed heartbeats before closing the TwilioConnection.
-
       var heartbeatTimeout = negotiatedTimeout * maxConsecutiveMissedHeartbeats;
-
-      // NOTE(mpatwardhan): Outgoing heartbeat is sent 200 ms earlier to account for network latency.
       var outgoingHeartbeatTimeout = negotiatedTimeout - OUTGOING_HEARTBEAT_OFFSET;
 
       this._welcomeTimeout.clear();
@@ -26081,31 +26056,16 @@ var OrderedTrackMatcher = function () {
 
 module.exports = OrderedTrackMatcher;
 },{"../":146,"../../":141}],152:[function(require,module,exports){
-/* globals RTCPeerConnection, webkitRTCPeerConnection, mozRTCPeerConnection, chrome, navigator */
+/* globals chrome, navigator */
 'use strict';
 
 function _toArray(arr) { return Array.isArray(arr) ? arr : Array.from(arr); }
 
 var _require = require('@twilio/webrtc/lib/util'),
-    guessBrowser = _require.guessBrowser;
+    guessBrowser = _require.guessBrowser,
+    isWebRTCSupported = _require.support;
 
 var SUPPORTED_CHROME_BASED_BROWSERS = ['edg', 'edge', 'electron', 'headlesschrome'];
-
-/**
- * Check whether PeerConnection API is supported.
- * @returns {boolean}
- */
-function isRTCPeerConnectionSupported() {
-  return typeof RTCPeerConnection !== 'undefined' || typeof webkitRTCPeerConnection !== 'undefined' || typeof mozRTCPeerConnection !== 'undefined';
-}
-
-/**
- * Check whether GetUserMedia API is supported.
- * @returns {boolean}
- */
-function isGetUserMediaSupported() {
-  return !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) || !!navigator.getUserMedia || !!navigator.webkitGetUserMedia || !!navigator.mozGetUserMedia;
-}
 
 /**
  * Check whether the current browser is non-Chromium Edge.
@@ -26166,7 +26126,7 @@ function rebrandedChromeBrowser(browser) {
 function isSupported() {
   var browser = guessBrowser();
   var rebrandedChrome = rebrandedChromeBrowser(browser);
-  return !!browser && isGetUserMediaSupported() && isRTCPeerConnectionSupported() && (!rebrandedChrome || SUPPORTED_CHROME_BASED_BROWSERS.includes(rebrandedChrome)) && !isNonChromiumEdge(browser);
+  return !!browser && isWebRTCSupported() && (!rebrandedChrome || SUPPORTED_CHROME_BASED_BROWSERS.includes(rebrandedChrome)) && !isNonChromiumEdge(browser);
 }
 
 module.exports = isSupported;
@@ -27956,66 +27916,29 @@ to get a new one, but we\'ve run out of retries; returning it anyway.');
 module.exports = workaround;
 },{"./audiocontext":157,"./detectsilence":158}],160:[function(require,module,exports){
 module.exports={
-  "_from": "twilio-video@2.5.0",
-  "_id": "twilio-video@2.5.0",
-  "_inBundle": false,
-  "_integrity": "sha512-mc2JnZkwYHmedOhPyW6ypcbA1ieMey1g2IFAFGi+X9o8mmfWIm1iFgHW6M32O8BrjrE571C7UOpUQobKMmuUrQ==",
-  "_location": "/twilio-video",
-  "_phantomChildren": {},
-  "_requested": {
-    "type": "version",
-    "registry": true,
-    "raw": "twilio-video@2.5.0",
-    "name": "twilio-video",
-    "escapedName": "twilio-video",
-    "rawSpec": "2.5.0",
-    "saveSpec": null,
-    "fetchSpec": "2.5.0"
-  },
-  "_requiredBy": [
-    "#USER",
-    "/"
-  ],
-  "_resolved": "https://registry.npmjs.org/twilio-video/-/twilio-video-2.5.0.tgz",
-  "_shasum": "265e7459e9f1c9991e201318b21c3338b3f7b6d0",
-  "_spec": "twilio-video@2.5.0",
-  "_where": "/media/fippo/houseparty/opentok/twilio",
-  "author": {
-    "name": "Mark Andrus Roberts",
-    "email": "mroberts@twilio.com"
-  },
-  "browser": {
-    "ws": "./src/ws.js",
-    "xmlhttprequest": "./src/xmlhttprequest.js"
-  },
-  "bugs": {
-    "url": "https://github.com/twilio/twilio-video.js/issues"
-  },
-  "bundleDependencies": false,
-  "contributors": [
-    {
-      "name": "Ryan Rowland",
-      "email": "rrowland@twilio.com"
-    },
-    {
-      "name": "Manjesh Malavalli",
-      "email": "mmalavalli@twilio.com"
-    },
-    {
-      "name": "Makarand Patwardhan",
-      "email": "mpatwardhan@twilio.com"
-    }
-  ],
-  "dependencies": {
-    "@twilio/webrtc": "4.2.1",
-    "backoff": "^2.5.0",
-    "chromedriver": "2.28.0",
-    "puppeteer": "^1.11.0",
-    "ws": "^3.3.1",
-    "xmlhttprequest": "^1.8.0"
-  },
-  "deprecated": false,
+  "name": "twilio-video",
+  "title": "Twilio Video",
   "description": "Twilio Video JavaScript library",
+  "version": "2.5.1",
+  "homepage": "https://twilio.com",
+  "author": "Mark Andrus Roberts <mroberts@twilio.com>",
+  "contributors": [
+    "Ryan Rowland <rrowland@twilio.com>",
+    "Manjesh Malavalli <mmalavalli@twilio.com>",
+    "Makarand Patwardhan <mpatwardhan@twilio.com>"
+  ],
+  "keywords": [
+    "twilio",
+    "webrtc",
+    "library",
+    "javascript",
+    "video",
+    "rooms"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/twilio/twilio-video.js.git"
+  },
   "devDependencies": {
     "@types/express": "^4.11.0",
     "@types/node": "^8.5.1",
@@ -28025,6 +27948,7 @@ module.exports={
     "babel-preset-es2015": "^6.24.1",
     "browserify": "^14.3.0",
     "cheerio": "^0.22.0",
+    "chromedriver": "^2.28.0",
     "cors": "^2.8.5",
     "electron": "^5.0.13",
     "envify": "^4.0.0",
@@ -28055,6 +27979,7 @@ module.exports={
     "karma-spec-reporter": "0.0.32",
     "mocha": "^3.2.0",
     "npm-run-all": "^4.0.2",
+    "puppeteer": "^1.20.0",
     "requirejs": "^2.3.3",
     "rimraf": "^2.6.1",
     "selenium-webdriver": "3.3.0",
@@ -28075,74 +28000,64 @@ module.exports={
   "engines": {
     "node": ">=0.12"
   },
-  "homepage": "https://twilio.com",
-  "keywords": [
-    "twilio",
-    "webrtc",
-    "library",
-    "javascript",
-    "video",
-    "rooms"
-  ],
   "license": "BSD-3-Clause",
   "main": "./es5/index.js",
-  "name": "twilio-video",
-  "optionalDependencies": {
-    "chromedriver": "2.28.0",
-    "puppeteer": "^1.11.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/twilio/twilio-video.js.git"
-  },
   "scripts": {
-    "build": "npm-run-all clean lint docs cover test:integration build:es5 build:js build:min.js test:umd",
-    "build:es5": "rimraf ./es5 && babel lib -d es5",
-    "build:js": "node ./scripts/build.js ./src/twilio-video.js ./LICENSE.md ./dist/twilio-video.js",
-    "build:min.js": "uglifyjs ./dist/twilio-video.js -o ./dist/twilio-video.min.js --comments \"/^! twilio-video.js/\" -b beautify=false,ascii_only=true",
-    "build:quick": "npm-run-all clean lint docs build:es5 build:js build:min.js",
-    "build:travis": "npm-run-all clean lint docs cover build:es5 build:js build:min.js test:umd test:framework",
-    "clean": "rimraf ./coverage ./es5 ./dist",
-    "cover": "istanbul cover node_modules/mocha/bin/_mocha -- ./test/unit/index.js",
-    "docs": "node ./scripts/docs.js ./dist/docs",
     "lint": "eslint ./lib ./test/*.js ./docker/**/*.js ./test/framework/*.js ./test/lib/*.js ./test/integration/** ./test/unit/**",
-    "test": "npm-run-all test:unit test:integration",
-    "test:crossbrowser": "npm-run-all test:crossbrowser:*",
-    "test:crossbrowser:build": "npm-run-all test:crossbrowser:build:*",
-    "test:crossbrowser:build:browser": "cd ./test/crossbrowser && browserify lib/crossbrowser/src/browser/index.js > src/browser/index.js",
+    "test:unit": "mocha ./test/unit/index.js",
+    "test:integration:adapter": "node ./scripts/karma.js karma/integration.adapter.conf.js",
+    "test:integration:travis": "node ./scripts/integration.js",
+    "test:integration": "node ./scripts/karma.js karma/integration.conf.js",
+    "test:umd": "mocha ./test/umd/index.js",
     "test:crossbrowser:build:clean": "rimraf ./test/crossbrowser/lib ./test/crossbrowser/src/browser/index.js",
     "test:crossbrowser:build:lint": "cd ./test/crossbrowser && tslint --project tsconfig.json",
     "test:crossbrowser:build:tsc": "cd ./test/crossbrowser && tsc",
+    "test:crossbrowser:build:browser": "cd ./test/crossbrowser && browserify lib/crossbrowser/src/browser/index.js > src/browser/index.js",
+    "test:crossbrowser:build": "npm-run-all test:crossbrowser:build:*",
     "test:crossbrowser:test": "cd ./test/crossbrowser && mocha --compilers ts:ts-node/register test/integration/spec/**/*.ts",
-    "test:framework": "npm-run-all test:framework:angular test:framework:no-framework test:framework:react",
-    "test:framework:angular": "npm-run-all test:framework:angular:*",
-    "test:framework:angular:install": "cd ./test/framework/twilio-video-angular && rimraf ./node_modules package-lock.json && npm install",
-    "test:framework:angular:run": "mocha ./test/framework/twilio-video-angular.js",
-    "test:framework:no-framework": "npm-run-all test:framework:no-framework:*",
-    "test:framework:no-framework:run": "mocha ./test/framework/twilio-video-no-framework.js",
-    "test:framework:react": "npm-run-all test:framework:react:*",
-    "test:framework:react:build": "cd ./test/framework/twilio-video-react && npm run build",
-    "test:framework:react:install": "cd ./test/framework/twilio-video-react && rimraf ./node_modules package-lock.json && npm install",
-    "test:framework:react:run": "mocha ./test/framework/twilio-video-react.js",
-    "test:framework:react:test": "node ./scripts/framework.js twilio-video-react",
-    "test:integration": "node ./scripts/karma.js karma/integration.conf.js",
-    "test:integration:adapter": "node ./scripts/karma.js karma/integration.adapter.conf.js",
-    "test:integration:travis": "node ./scripts/integration.js",
-    "test:sdkdriver": "npm-run-all test:sdkdriver:*",
-    "test:sdkdriver:build": "npm-run-all test:sdkdriver:build:*",
+    "test:crossbrowser": "npm-run-all test:crossbrowser:*",
     "test:sdkdriver:build:clean": "rimraf ./test/lib/sdkdriver/lib ./test/lib/sdkdriver/test/integration/browser/index.js",
     "test:sdkdriver:build:lint": "cd ./test/lib/sdkdriver && tslint --project tsconfig.json",
     "test:sdkdriver:build:tsc": "cd ./test/lib/sdkdriver && tsc --rootDir src",
-    "test:sdkdriver:test": "npm-run-all test:sdkdriver:test:*",
-    "test:sdkdriver:test:integration": "npm-run-all test:sdkdriver:test:integration:*",
+    "test:sdkdriver:build": "npm-run-all test:sdkdriver:build:*",
+    "test:sdkdriver:test:unit": "cd ./test/lib/sdkdriver && mocha --compilers ts:ts-node/register test/unit/spec/**/*.ts",
     "test:sdkdriver:test:integration:browser": "cd ./test/lib/sdkdriver/test/integration && browserify browser/browser.js > browser/index.js",
     "test:sdkdriver:test:integration:run": "cd ./test/lib/sdkdriver && mocha --compilers ts:ts-node/register test/integration/spec/**/*.ts",
-    "test:sdkdriver:test:unit": "cd ./test/lib/sdkdriver && mocha --compilers ts:ts-node/register test/unit/spec/**/*.ts",
-    "test:umd": "mocha ./test/umd/index.js",
-    "test:unit": "mocha ./test/unit/index.js"
+    "test:sdkdriver:test:integration": "npm-run-all test:sdkdriver:test:integration:*",
+    "test:sdkdriver:test": "npm-run-all test:sdkdriver:test:*",
+    "test:sdkdriver": "npm-run-all test:sdkdriver:*",
+    "test:framework:angular:install": "cd ./test/framework/twilio-video-angular && rimraf ./node_modules package-lock.json && npm install",
+    "test:framework:angular:run": "mocha ./test/framework/twilio-video-angular.js",
+    "test:framework:angular": "npm-run-all test:framework:angular:*",
+    "test:framework:no-framework:run": "mocha ./test/framework/twilio-video-no-framework.js",
+    "test:framework:no-framework": "npm-run-all test:framework:no-framework:*",
+    "test:framework:react:install": "cd ./test/framework/twilio-video-react && rimraf ./node_modules package-lock.json && npm install",
+    "test:framework:react:test": "node ./scripts/framework.js twilio-video-react",
+    "test:framework:react:build": "cd ./test/framework/twilio-video-react && npm run build",
+    "test:framework:react:run": "mocha ./test/framework/twilio-video-react.js",
+    "test:framework:react": "npm-run-all test:framework:react:*",
+    "test:framework": "npm-run-all test:framework:angular test:framework:no-framework test:framework:react",
+    "test": "npm-run-all test:unit test:integration",
+    "build:es5": "rimraf ./es5 && babel lib -d es5",
+    "build:js": "node ./scripts/build.js ./src/twilio-video.js ./LICENSE.md ./dist/twilio-video.js",
+    "build:min.js": "uglifyjs ./dist/twilio-video.js -o ./dist/twilio-video.min.js --comments \"/^! twilio-video.js/\" -b beautify=false,ascii_only=true",
+    "build": "npm-run-all clean lint docs cover test:integration build:es5 build:js build:min.js test:umd",
+    "build:travis": "npm-run-all clean lint docs cover build:es5 build:js build:min.js test:umd test:framework",
+    "build:quick": "npm-run-all clean lint docs build:es5 build:js build:min.js",
+    "docs": "node ./scripts/docs.js ./dist/docs",
+    "clean": "rimraf ./coverage ./es5 ./dist",
+    "cover": "istanbul cover node_modules/mocha/bin/_mocha -- ./test/unit/index.js"
   },
-  "title": "Twilio Video",
-  "version": "2.5.0"
+  "dependencies": {
+    "@twilio/webrtc": "4.3.0",
+    "backoff": "^2.5.0",
+    "ws": "^3.3.1",
+    "xmlhttprequest": "^1.8.0"
+  },
+  "browser": {
+    "ws": "./src/ws.js",
+    "xmlhttprequest": "./src/xmlhttprequest.js"
+  }
 }
 
 },{}],161:[function(require,module,exports){
