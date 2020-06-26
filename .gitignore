@@ -2,3 +2,4 @@
 .idea
 .netlify
 .env
+build/main.js

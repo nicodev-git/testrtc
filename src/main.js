@@ -8,8 +8,9 @@ async function fetchToken(user, roomName) {
     return res.text();
 }
 
-const user = uuid.v4();
-const roomName = window.location.pathname.substr(1);
+const params = new URLSearchParams(window.location.search);
+const user = params.get('user') || uuid.v4();
+const roomName = params.get('room') || 'default';
 fetchToken(user, roomName)
 .then(async (token) => {
     console.log('token', token);
