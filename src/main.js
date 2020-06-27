@@ -13,7 +13,7 @@ const user = params.get('user') || uuid.v4();
 const roomName = params.get('room') || 'default';
 fetchToken(user, roomName)
 .then(async (token) => {
-    console.log('token V4', token);
+    console.log('token V5', token);
     const options = {
         audio: true,
         video: {width: 1280},
