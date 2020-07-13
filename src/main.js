@@ -55,6 +55,11 @@ fetchToken(user, roomName)
 		participant.on('trackSubscribed', track => {
             container.appendChild(track.attach());
 		});
+        window.postMessage({
+          type: 'participantConnected',
+          sid: participant.sid,
+          existing: false,
+        });
 	});
 	room.participants.forEach(participant => {
         const container = document.createElement('div');
@@ -76,6 +81,11 @@ fetchToken(user, roomName)
 		participant.on('trackSubscribed', track => {
             container.appendChild(track.attach());
         });
+        window.postMessage({
+          type: 'participantConnected',
+          sid: participant.sid,
+          existing: true,
+        });
     });
     room.on('participantDisconnected', participant => {
 		console.log(`Participant disconnected: ${participant.identity}`);
@@ -87,6 +97,10 @@ fetchToken(user, roomName)
             }
         });
         document.getElementById(participant.sid).remove();
+        window.postMessage({
+          type: 'participantDisconnected',
+          sid: participant.sid,
+        });
 	});
 
 });
