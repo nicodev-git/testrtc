@@ -3,3 +3,4 @@
 .netlify
 .env
 build/main.js
+node_modules
