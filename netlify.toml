@@ -7,3 +7,4 @@
   from = "/token/*"
   to = "/.netlify/functions/get-token?identity=:identity&roomName=:roomName"
   query = {identity = ":identity", roomName = ":roomName"}
+  status = 302
