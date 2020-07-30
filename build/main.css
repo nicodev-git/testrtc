@@ -1,6 +1,9 @@
 video {
-    width: 320px;
-    height: 180px;
+    width: 25%;
+}
+
+#localVideoContainer {
+    float: left
 }
 
 #localVideoContainer>video{
