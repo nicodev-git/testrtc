@@ -3,8 +3,8 @@ video {
 }
 
 #localVideoContainer {
-    float: left;
-    width: 25%;
+    float: right;
+    width: 160px;
 }
 
 #localVideoContainer>video{
