@@ -36,7 +36,7 @@ fetchToken(user, roomName)
     room.on('participantConnected', participant => {
 		console.log(`Participant "${participant.identity}" connected`);
 
-        const container = document.createElement('div');
+        const container = document.createElement('span');
         container.id = participant.sid;
         document.getElementById('remotes').appendChild(container);
 		participant.tracks.forEach(publication => {
@@ -62,7 +62,7 @@ fetchToken(user, roomName)
         });
 	});
 	room.participants.forEach(participant => {
-        const container = document.createElement('div');
+        const container = document.createElement('span');
         container.id = participant.sid;
         document.getElementById('remotes').appendChild(container);
 		participant.tracks.forEach(publication => {
