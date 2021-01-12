@@ -6,6 +6,6 @@ exports.handler = async () => {
   console.log(`get-webex-token:handler`, { token });
   return {
     statusCode: 200,
-    body: { token },
+    body: token || "",
   };
 };
