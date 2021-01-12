@@ -9,3 +9,8 @@ No mention of resolution-adaptivity...
 
 
 http://localhost:8081/token?identity=6e68500b-4fe2-478a-82ad-4a683d76940c&roomName=room
+
+# webex functions
+
+https://twilio-playground.netlify.app/.netlify/functions/save-webex-token/?token=test2
+https://twilio-playground.netlify.app/.netlify/functions/get-webex-token

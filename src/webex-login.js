@@ -1,7 +1,7 @@
 async function saveToken() {
   const token = "Sample";
   const url = "/.netlify/functions/save-webex-token";
-  fetch(`${url}/?token${token}`)
+  fetch(`${url}/?token=${token}`)
     .then((answer) => {
       console.log(`webex-login:saveToken`, { token, answer });
     })
