@@ -36,7 +36,7 @@ fetchToken(user, roomName)
     room.on('participantConnected', participant => {
 		console.log(`Participant "${participant.identity}" connected`);
 
-        const container = document.createElement('div');
+        const container = document.createElement('span');
         container.id = participant.sid;
         document.getElementById('remotes').appendChild(container);
 		participant.tracks.forEach(publication => {
@@ -62,7 +62,7 @@ fetchToken(user, roomName)
         });
 	});
 	room.participants.forEach(participant => {
-        const container = document.createElement('div');
+        const container = document.createElement('span');
         container.id = participant.sid;
         document.getElementById('remotes').appendChild(container);
 		participant.tracks.forEach(publication => {
@@ -102,5 +102,13 @@ fetchToken(user, roomName)
           sid: participant.sid,
         });
 	});
-
+    document.getElementById('screenshareButton').addEventListener('click', async () => {
+        const stream = await navigator.mediaDevices.getDisplayMedia({video: true});
+        const localDisplay = document.createElement('video');
+        localDisplay.muted = true;
+        localDisplay.autoplay = true;
+        localDisplay.srcObject = stream;
+        localVideoContainer.appendChild(localDisplay);
+        room.localParticipant.publishTrack(stream.getTracks()[0]);
+    });
 });

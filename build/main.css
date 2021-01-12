@@ -1,8 +1,13 @@
 video {
-    width: 320px;
-    height: 180px;
+    width: 25%;
+}
+
+#localVideoContainer {
+    float: right;
+    width: 160px;
 }
 
 #localVideoContainer>video{
     transform: scale(-1, 1);
+    width: 100%;
 }
