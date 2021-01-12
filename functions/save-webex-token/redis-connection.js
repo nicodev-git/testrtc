@@ -12,7 +12,7 @@ const setAsync = promisify(client.set).bind(client);
 const getAsync = promisify(client.get).bind(client);
 
 exports.save = async (token) => {
-  await setAsync(webexKey, token, redis.print);
+  await setAsync(webexKey, token);
   client.expire(webexKey, 60 * 60 * 24 * 30); // 30 days
 };
 
