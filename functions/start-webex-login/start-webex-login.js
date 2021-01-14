@@ -20,7 +20,7 @@ exports.handler = async (event) => {
     }
   });
   webex.authorization.requestAuthorizationCodeGrant({code})
-    .then(() => {
+    .then(async () => {
       await save(webex.credentials.supertoken.toJSON());
       res.redirect('/webex-login.html' + querystring.stringify(webex.credentials.supertoken.toJSON())).end();
     });
