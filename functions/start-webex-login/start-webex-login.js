@@ -27,9 +27,9 @@ exports.handler = async (event) => {
   });
   return {
     statusCode: 302,
-    body: JSON.stringify({ msg: webex.credentials.supertoken.toJSON()}),
+    body: JSON.stringify({ msg: webex.credentials}),
     headers: {
-      location: "/webex-login.html" + querystring.stringify(webex.credentials.supertoken.toJSON())
+      location: "/webex-login.html" + querystring.stringify(webex.credentials.supertoken)
     }
   }
   // webex.authorization.requestAuthorizationCodeGrant({ code })
