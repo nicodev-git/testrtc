@@ -20,20 +20,23 @@ exports.handler = async (event) => {
       }
     }
   });
-  const accessToken = await webex.authorization.requestAuthorizationCodeGrant({ code, state })
-  .catch((err) => {
+
+  webex.once(`ready`, async () => {
+    const accessToken = await webex.authorization.requestAuthorizationCodeGrant({ code, state })
+      .catch((err) => {
+        return {
+          statusCode: 500,
+          body: JSON.stringify({ err })
+        }
+      });
     return {
-      statusCode: 500,
-      body: JSON.stringify({ err })
+      statusCode: 302,
+      body: JSON.stringify({ msg: accessToken }),
+      headers: {
+        location: "/webex-login.html?token=" + JSON.stringify(accessToken)
+      }
     }
   });
-  return {
-    statusCode: 302,
-    body: JSON.stringify({ msg: accessToken}),
-    headers: {
-      location: "/webex-login.html?token=" + JSON.stringify(accessToken)
-    }
-  }
 };
 
 exports.startWebexLogin = async (code) => {
@@ -50,7 +53,7 @@ exports.startWebexLogin = async (code) => {
   await webex.authorization.requestAuthorizationCodeGrant({ code })
   return {
     statusCode: 302,
-    body: JSON.stringify({ msg: webex.credentials.supertoken.toJSON()}),
+    body: JSON.stringify({ msg: webex.credentials.supertoken.toJSON() }),
     headers: {
       location: "/webex-login.html" + querystring.stringify(webex.credentials.supertoken.toJSON())
     }
