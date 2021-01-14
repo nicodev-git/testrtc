@@ -5,6 +5,7 @@ const config = require('../get-webex-token/server-config.js')
 
 exports.handler = async (event) => {
   const code = event.queryStringParameters.code;
+  const state = event.queryStringParameters.state;
 
   console.log(`start-webex-login:handler`);
 
@@ -19,7 +20,7 @@ exports.handler = async (event) => {
       }
     }
   });
-  const accessToken = await webex.authorization.requestAuthorizationCodeGrant({ code })
+  const accessToken = await webex.authorization.requestAuthorizationCodeGrant({ code, state })
   .catch((err) => {
     return {
       statusCode: 500,
