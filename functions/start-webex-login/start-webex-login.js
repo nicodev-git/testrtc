@@ -18,11 +18,25 @@ exports.handler = async (event) => {
       }
     }
   });
-  webex.authorization.requestAuthorizationCodeGrant({ code })
-    .then(async () => {
-      await save(webex.credentials.supertoken.toJSON());
-      res.redirect('/webex-login.html' + querystring.stringify(webex.credentials.supertoken.toJSON())).end();
-    });
+  await webex.authorization.requestAuthorizationCodeGrant({ code })
+  return {
+    statusCode: 302,
+    //body: JSON.stringify({ msg: response }),
+    headers: {
+      location: "/webex-login.html" + querystring.stringify(webex.credentials.supertoken.toJSON())
+    }
+  }
+  // webex.authorization.requestAuthorizationCodeGrant({ code })
+  //   .then(async () => {
+  //     await save(webex.credentials.supertoken.toJSON());
+  //     res.redirect('/webex-login.html' + querystring.stringify(webex.credentials.supertoken.toJSON())).end();
+  //   }).catch((err) => {
+  //     console.log(err);
+  //     return {
+  //       statusCode: 500,
+  //       body: err || "",
+  //     };
+  //   });
 };
 
 exports.startWebexLogin = async (code) => {
@@ -36,9 +50,12 @@ exports.startWebexLogin = async (code) => {
       }
     }
   });
-  webex.authorization.requestAuthorizationCodeGrant({ code })
-    .then(async () => {
-      await save(webex.credentials.supertoken.toJSON());
-      res.redirect('/webex-login.html' + querystring.stringify(webex.credentials.supertoken.toJSON())).end();
-    });
+  await webex.authorization.requestAuthorizationCodeGrant({ code })
+  return {
+    statusCode: 302,
+    //body: JSON.stringify({ msg: response }),
+    headers: {
+      location: "/webex-login.html" + querystring.stringify(webex.credentials.supertoken.toJSON())
+    }
+  }
 }
