@@ -1,3 +1,4 @@
+const config = require('./config')
 var Webex = require('webex');
 async function saveToken() {
   const token = "Sample";
@@ -9,31 +10,29 @@ async function saveToken() {
     .catch(console.error);
 }
 
-function start() {
-  document.getElementById("save-token").onclick = function () {
-    saveToken();
-  };
-  console.log(`webex-login:start`);
-
+function user1Login() {
   var webex = Webex.init({
     config: {
       credentials: {
-        authorizationString: '',
+        authorizationString: config.authUrl,
         clientType: 'confidential',
         refreshCallback: function(webex, token) {
-          return fetch(`/webex/oauth/refresh`, {
+          return fetch(`.netlify/functions/refresh-webex-token`, {
             method: `POST`,
             body: JSON.stringify({
               refresh_token: token.refresh_token
             })
           })
-            .then((res) => res.json())
+          .then((res) => res.json())
         }
       }
     }
   });
+  console.log(`webex-login:started`);
 
   webex.once(`ready`, function () {
+  console.log(`webex-login:ready`);
+
     if (webex.canAuthorize) {
       // your app logic goes here
     }
@@ -41,6 +40,19 @@ function start() {
       webex.authorization.initiateLogin()
     }
   });
+}
+
+function start() {
+  document.getElementById("save-token").onclick = function () {
+    saveToken();
+  };
+  document.getElementById("user1-login").onclick = function () {
+    user1Login();
+  };
+  document.getElementById("user2-login").onclick = function () {
+    user1Login();
+  };
+  console.log(`webex-login:start`);
 }
 
 start();
