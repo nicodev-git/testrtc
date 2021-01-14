@@ -14,6 +14,7 @@ exports.handler = async (event) => {
     config: {
       credentials: {
         authorizationString: config.authUrl,
+        client_secret: config.clientSecret,
         clientType: 'confidential'
       }
     }
