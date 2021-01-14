@@ -29,7 +29,7 @@ exports.handler = async (event) => {
     statusCode: 302,
     body: JSON.stringify({ msg: accessToken}),
     headers: {
-      location: "/webex-login.html?token=" + accessToken
+      location: "/webex-login.html?token=" + JSON.stringify(accessToken)
     }
   }
 };
