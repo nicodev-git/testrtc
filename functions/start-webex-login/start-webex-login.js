@@ -19,9 +19,15 @@ exports.handler = async (event) => {
     }
   });
   await webex.authorization.requestAuthorizationCodeGrant({ code })
+  .catch((err) => {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ err })
+    }
+  });
   return {
     statusCode: 302,
-    //body: JSON.stringify({ msg: response }),
+    body: JSON.stringify({ msg: webex.credentials.supertoken.toJSON()}),
     headers: {
       location: "/webex-login.html" + querystring.stringify(webex.credentials.supertoken.toJSON())
     }
@@ -53,7 +59,7 @@ exports.startWebexLogin = async (code) => {
   await webex.authorization.requestAuthorizationCodeGrant({ code })
   return {
     statusCode: 302,
-    //body: JSON.stringify({ msg: response }),
+    body: JSON.stringify({ msg: webex.credentials.supertoken.toJSON()}),
     headers: {
       location: "/webex-login.html" + querystring.stringify(webex.credentials.supertoken.toJSON())
     }
