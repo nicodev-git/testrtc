@@ -3,11 +3,16 @@ const app = express();
 const path = require('path');
 
 const  { getTwilioToken } = require("./functions/get-token/get-twilio-token");
+const  { startWebexLogin } = require("./functions/start-webex-login/start-webex-login");
 
 app.use(express.static(path.join(__dirname, 'build')));
 
 app.get('/token', async (req, res) => {
   res.send(await getTwilioToken(req.query));
+});
+
+app.get('/start-webex-login', async (req, res) => {
+  res.send(await startWebexLogin(req.query));
 });
 
 app.get('*', (_, res) => res.sendFile(path.join(__dirname, 'build/index.html')));
