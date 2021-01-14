@@ -8,7 +8,21 @@ exports.handler = async (event) => {
 
   console.log(`start-webex-login:handler`);
 
-  return startWebexLogin(code);
+  console.log(config.authUrl)
+  assert(code);
+  var webex = Webex.init({
+    config: {
+      credentials: {
+        authorizationString: config.authUrl,
+        clientType: 'confidential'
+      }
+    }
+  });
+  webex.authorization.requestAuthorizationCodeGrant({ code })
+    .then(async () => {
+      await save(webex.credentials.supertoken.toJSON());
+      res.redirect('/webex-login.html' + querystring.stringify(webex.credentials.supertoken.toJSON())).end();
+    });
 };
 
 exports.startWebexLogin = async (code) => {
