@@ -15,12 +15,11 @@ exports.handler = async (event) => {
     config: {
       credentials: {
         authorizationString: config.authUrl,
-        client_secret: config.clientSecret,
         clientType: 'confidential'
       }
     }
   });
-  webex.requestAuthorizationCodeGrant({code})
+  webex.authorization.requestAuthorizationCodeGrant({code})
     .then(() => {
 
       res.redirect('/#' + querystring.stringify(webex.credentials.supertoken.toJSON())).end();
