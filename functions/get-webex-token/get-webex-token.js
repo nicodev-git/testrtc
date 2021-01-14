@@ -1,7 +1,7 @@
 const { get } = require("../save-webex-token/redis-connection");
 var Webex = require('webex');
 const assert = require(`assert`);
-const config = require('./server-config')
+const config = require('./server-config.js')
 
 exports.handler = async (event) => {
   //const token = await get();
@@ -9,11 +9,13 @@ exports.handler = async (event) => {
 
   console.log(`get-webex-token:handler`);
 
+  console.log(config.authUrl)
   assert(code);
   var webex = Webex.init({
     config: {
       credentials: {
         authorizationString: config.authUrl,
+        client_secret: config.clientSecret,
         clientType: 'confidential'
       }
     }

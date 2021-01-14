@@ -1,4 +1,4 @@
-const config = require('./config')
+const config = require('./config.js')
 var Webex = require('webex');
 async function saveToken() {
   const token = "Sample";
@@ -11,6 +11,7 @@ async function saveToken() {
 }
 
 function user1Login() {
+  console.log(config.authUrl)
   var webex = Webex.init({
     config: {
       credentials: {

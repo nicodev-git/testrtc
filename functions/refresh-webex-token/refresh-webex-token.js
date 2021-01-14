@@ -1,5 +1,5 @@
 const { save } = require("../save-webex-token/redis-connection");
-const config = require('../get-webex-token/server-config')
+const config = require('../get-webex-token/server-config.js')
 
 // this will be called from CRON
 exports.handler = async (event) => {
