@@ -21,22 +21,21 @@ exports.handler = async (event) => {
     }
   });
 
-  webex.once(`ready`, async () => {
-    return await webex.authorization.requestAuthorizationCodeGrant({code})
-      .then(() => {
-        return {
-          statusCode: 302,
-          body: "",
-          headers: {
-            location: "/webex-login.html"
-          }
+  await webex.once(`ready`)
+  return await webex.authorization.requestAuthorizationCodeGrant({ code })
+    .then(() => {
+      return {
+        statusCode: 302,
+        body: "",
+        headers: {
+          location: "/webex-login.html"
         }
-      })
-      .catch((err) => {
-        return {
-          statusCode: 500,
-          body: JSON.stringify({ err })
-        }
-      });
-  });
+      }
+    })
+    .catch((err) => {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ err })
+      }
+    });
 };
