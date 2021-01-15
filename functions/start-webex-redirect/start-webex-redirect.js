@@ -22,40 +22,13 @@ exports.handler = async (event) => {
   });
 
   webex.once(`ready`, async () => {
-    let url = await webex.credentials.buildLoginUrl({clientType: 'confidential'})
-    return {
-      statusCode: 302,
-      body: "",
-      headers: {
-        location: url
-      }
-    }
-  });
-};
-
-exports.startWebexLogin = async (code) => {
-  //console.log(config.authUrl)
-  var webex = Webex.init({
-    config: {
-      credentials: {
-        authorizationString: config.authUrl,
-        client_secret: config.clientSecret,
-        clientType: 'confidential'
-      }
-    }
-  });
-
-  webex.once(`ready`, async () => {
-    console.log('webex:ready')
-    let url = await webex.credentials.buildLoginUrl({clientType: 'confidential'})
-    console.log('webex:url ' + url)
     return await webex.authorization.requestAuthorizationCodeGrant({code})
       .then(() => {
         return {
           statusCode: 302,
-          body: JSON.stringify({ msg: url }),
+          body: "",
           headers: {
-            location: "/webex-login.html?token=" + JSON.stringify({url})
+            location: "/webex-login.html"
           }
         }
       })
@@ -66,4 +39,4 @@ exports.startWebexLogin = async (code) => {
         }
       });
   });
-}
+};
