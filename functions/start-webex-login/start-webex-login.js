@@ -4,13 +4,9 @@ const assert = require(`assert`);
 const config = require('../get-webex-token/server-config.js')
 
 exports.handler = async (event) => {
-  const code = event.queryStringParameters.code;
-  const state = event.queryStringParameters.state;
 
   console.log(`start-webex-login:handler`);
 
-  console.log(config.authUrl)
-  assert(code);
   var webex = Webex.init({
     config: {
       credentials: {
@@ -21,16 +17,15 @@ exports.handler = async (event) => {
     }
   });
 
-  webex.once(`ready`, async () => {
-    let url = await webex.credentials.buildLoginUrl({clientType: 'confidential'})
-    return {
-      statusCode: 302,
-      body: "",
-      headers: {
-        location: url
-      }
+  await webex.once(`ready`);
+  let url = await webex.credentials.buildLoginUrl({ clientType: 'confidential' })
+  return {
+    statusCode: 302,
+    body: "",
+    headers: {
+      location: url
     }
-  });
+  }
 };
 
 exports.startWebexLogin = async (code) => {
@@ -47,15 +42,15 @@ exports.startWebexLogin = async (code) => {
 
   webex.once(`ready`, async () => {
     console.log('webex:ready')
-    let url = await webex.credentials.buildLoginUrl({clientType: 'confidential'})
+    let url = await webex.credentials.buildLoginUrl({ clientType: 'confidential' })
     console.log('webex:url ' + url)
-    return await webex.authorization.requestAuthorizationCodeGrant({code})
+    return await webex.authorization.requestAuthorizationCodeGrant({ code })
       .then(() => {
         return {
           statusCode: 302,
           body: JSON.stringify({ msg: url }),
           headers: {
-            location: "/webex-login.html?token=" + JSON.stringify({url})
+            location: "/webex-login.html?token=" + JSON.stringify({ url })
           }
         }
       })
