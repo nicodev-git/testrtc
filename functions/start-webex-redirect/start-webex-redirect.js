@@ -5,7 +5,6 @@ const config = require('../get-webex-token/server-config.js')
 
 exports.handler = async (event) => {
   const code = event.queryStringParameters.code;
-  const state = event.queryStringParameters.state;
 
   console.log(`start-webex-login:handler`);
 
@@ -21,7 +20,7 @@ exports.handler = async (event) => {
   });
 
   await webex.once(`ready`)
-  return await webex.authorization.requestAuthorizationCodeGrant({ code })
+  return await webex.authorization.requestAuthorizationCodeGrant(event.queryStringParameters)
     .then(() => {
       return {
         statusCode: 302,
