@@ -21,7 +21,7 @@ exports.handler = async (event) => {
   });
 
   await webex.once(`ready`)
-  return await webex.authorization.requestAuthorizationCodeGrant(code)
+  return await webex.authorization.requestAuthorizationCodeGrant({ code })
     .then(() => {
       return {
         statusCode: 302,
