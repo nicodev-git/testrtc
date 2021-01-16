@@ -15,14 +15,13 @@ exports.handler = async (event) => {
     config: {
       credentials: {
         authorizationString: config.authUrl,
-        client_secret: config.clientSecret,
-        clientType: 'confidential'
+        client_secret: config.clientSecret
       }
     }
   });
 
   await webex.once(`ready`)
-  return await webex.authorization.requestAuthorizationCodeGrant({ code })
+  return await webex.authorization.requestAuthorizationCodeGrant(code)
     .then(() => {
       return {
         statusCode: 302,
