@@ -42,19 +42,22 @@ exports.handler = async (event) => {
   //     }
   //   });
 
-  return axios
-    .post('/https://webexapis.com/v1/access_token',
-      querystring.stringify({
-        grant_type: 'authorization_code',
-        client_id: config.clientId,
-        client_secret: config.clientSecret,
-        code,
-        redirect_uri: config.redirectUri
-      }), {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      }
-    })
+  var data = querystring.stringify({
+    grant_type: 'authorization_code',
+    client_id: config.clientId,
+    client_secret: config.clientSecret,
+    code,
+    redirect_uri: config.redirectUri
+  });
+  var axiosConfig = {
+    method: 'post',
+    url: 'https://webexapis.com/v1/access_token',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    data: data
+  };
+  return axios(axiosConfig)
     .then((res) => {
       console.log(`statusCode: ${res.statusCode}`)
       console.log(res)
@@ -74,3 +77,43 @@ exports.handler = async (event) => {
       }
     })
 };
+
+exports.startWebexRedirect = async ({ code }) => {
+  console.log(config.clientId)
+  console.log(config.clientSecret)
+  console.log(config.redirectUri)
+  var data = querystring.stringify({
+    grant_type: 'authorization_code',
+    client_id: config.clientId,
+    client_secret: config.clientSecret,
+    code,
+    redirect_uri: config.redirectUri
+  });
+  var axiosConfig = {
+    method: 'post',
+    url: 'https://webexapis.com/v1/access_token',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    data: data
+  };
+  return axios(axiosConfig)
+    .then((res) => {
+      console.log(`statusCode: ${res.statusCode}`)
+      console.log(res)
+      return {
+        statusCode: 302,
+        body: "",
+        headers: {
+          location: "/webex-login.html"
+        }
+      }
+    })
+    .catch((error) => {
+      console.error(error)
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error })
+      }
+    })
+}
