@@ -5,9 +5,9 @@ const config = require('./server-config.js')
 
 exports.handler = async (event) => {
   const user = event.queryStringParameters.user;
-  const token = "";
+  let token = "";
 
-  if (user.toLowerCase() === 'user2') {
+  if (user && user.toLowerCase() === 'user2') {
     token = getUser2AccessToken();
   } else {
     // Defaulting to user 1
