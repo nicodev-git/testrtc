@@ -10,12 +10,12 @@ async function saveToken() {
     .catch(console.error);
 }
 
-function user1Login() {
+function userLogin(user) {
   console.log(config.authUrl)
   var webex = Webex.init({
     config: {
       credentials: {
-        authorizationString: config.authUrl,
+        authorizationString: config.authUrl+"&state="+user,
         clientType: 'confidential',
         refreshCallback: function(webex, token) {
           return fetch(`.netlify/functions/refresh-webex-token`, {
@@ -48,10 +48,10 @@ function start() {
     saveToken();
   };
   document.getElementById("user1-login").onclick = function () {
-    user1Login();
+    userLogin('user1');
   };
   document.getElementById("user2-login").onclick = function () {
-    user1Login();
+    userLogin('user2');
   };
   console.log(`webex-login:start`);
 }

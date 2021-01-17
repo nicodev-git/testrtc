@@ -1,4 +1,4 @@
-const { get } = require("../save-webex-token/redis-connection");
+const { saveUser1AccessToken, saveUser2AccessToken, saveUser1RefreshToken, saveUser2RefreshToken } = require("../save-webex-token/redis-connection");
 var Webex = require('webex');
 const assert = require(`assert`);
 const axios = require('axios')
@@ -7,40 +7,10 @@ const config = require('../get-webex-token/server-config.js')
 
 exports.handler = async (event) => {
   const code = event.queryStringParameters.code;
+  const state = event.queryStringParameters.state;
 
   console.log(`start-webex-redirect:handler`);
-
-  console.log(config.authUrl)
   assert(code);
-  // var webex = Webex.init({
-  //   config: {
-  //     credentials: {
-  //       authorizationString: config.authUrl,
-  //       client_secret: config.clientSecret
-  //     }
-  //   }
-  // });
-
-  // await webex.once(`ready`)
-  // return await webex.authorization.requestAuthorizationCodeGrant({code, grant_type:'authorization_code'})
-  //   .then(() => {
-  //     return {
-  //       statusCode: 302,
-  //       body: "",
-  //       headers: {
-  //         location: "/webex-login.html"
-  //       }
-  //     }
-  //   })
-  //   .catch((err) => {
-  //     return {
-  //       statusCode: 500,
-  //       body: JSON.stringify({ err }),
-  //       headers: {
-  //         "x-code": code
-  //       }
-  //     }
-  //   });
 
   var data = querystring.stringify({
     grant_type: 'authorization_code',
@@ -60,7 +30,16 @@ exports.handler = async (event) => {
   return axios(axiosConfig)
     .then((res) => {
       console.log(`statusCode: ${res.statusCode}`)
-      console.log(res)
+      //console.log(res)
+
+      if (state.toLowerCase() === 'user2') {
+        saveUser1AccessToken(res.access_token);
+        saveUser1RefreshToken(res.refresh_token);
+      } else {
+        saveUser2AccessToken(res.access_token);
+        saveUser2RefreshToken(res.refresh_token);
+      }
+
       return {
         statusCode: 302,
         body: "",
