@@ -35,7 +35,7 @@ exports.handler = async (event) => {
   return await axios(axiosConfig)
     .then((res) => {
       console.log(`statusCode: ${res.status}`)
-      console.log(res)
+      //console.log(res)
 
       if (res.status == 200) {
         if (user && user.toLowerCase() === 'user2') {
