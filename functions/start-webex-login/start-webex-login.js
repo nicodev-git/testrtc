@@ -11,16 +11,14 @@ exports.handler = async (event) => {
   var webex = Webex.init({
     config: {
       credentials: {
-        authorizationString: config.authUrl,
-        client_secret: config.clientSecret,
-        clientType: 'confidential'
+        authorizationString: config.authUrl
       }
     }
   });
 
   await webex.once(`ready`);
   let url = await webex.credentials.buildLoginUrl({ clientType: 'confidential' })
-  url += url+"&state="+(user?user:'user1')
+  url += "&state="+(user?user:'user1')
   console.log('start-webex-login:url ' + url)
   return {
     statusCode: 302,
