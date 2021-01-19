@@ -9,16 +9,16 @@ exports.handler = async (event) => {
   console.log('get-webex-token: user ' + user)
 
   if (user && user.toLowerCase() === 'user2') {
-    token = getUser2AccessToken();
+    token = await getUser2AccessToken();
   } else {
     // Defaulting to user 1
-    token = getUser1AccessToken();
+    token = await getUser1AccessToken();
   }
 
   console.log('get-webex-token: token ' + token)
 
   return {
     statusCode: 200,
-    body: "" + token,
+    body: token,
   };
 };
