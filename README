@@ -17,3 +17,27 @@ https://twilio-playground.netlify.app/webex-login.html
 https://twilio-playground.netlify.app/.netlify/functions/save-webex-token/?token=test2
 https://twilio-playground.netlify.app/.netlify/functions/get-webex-token
 https://twilio-playground.netlify.app/.netlify/functions/refresh-webex-token
+
+# webex setup
+1. Signup for webex developer (https://developer.webex.com/)
+2. In the developer dashboard, create an **Integration** with the following details.
+    (a) Redirect URI: https://twilio-playground.netlify.app/.netlify/functions/start-webex-redirect
+    (b) Scopes
+        meeting:schedules_read
+        meeting:schedules_write
+        meeting:recordings_read
+        meeting:recordings_write
+        meeting:preferences_read
+        meeting:preferences_write
+        meeting:controls_read
+        meeting:controls_write
+        meeting:participants_read
+        meeting:participants_write
+        spark:all
+        identity:placeonetimepassword_create
+3. Save the following information in **get-webex-token/server-config.js**
+    clientId
+    clientSecret
+    redirectUri
+    authUrl - final "OAuth Authorization URL"
+4. Based on netlify URL update the login URL in **src/webex-login.js**
