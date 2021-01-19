@@ -1,4 +1,4 @@
-const { getUser1RefreshToken, getUser2RefreshToken } = require("../save-webex-token/redis-connection");
+const { saveUser1AccessToken, saveUser1RefreshToken, getUser1RefreshToken, saveUser2AccessToken, saveUser2RefreshToken, getUser2RefreshToken } = require("../save-webex-token/redis-connection");
 const axios = require('axios')
 var querystring = require('querystring');
 const config = require('../get-webex-token/server-config.js')
@@ -31,7 +31,7 @@ exports.handler = async (event) => {
     data: data
   };
   console.log(`refresh-webex-token:user ` + user);
-  
+
   return await axios(axiosConfig)
     .then((res) => {
       console.log(`statusCode: ${res.status}`)
