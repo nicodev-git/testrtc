@@ -6,6 +6,7 @@ const config = require('./server-config.js')
 exports.handler = async (event) => {
   const user = event.queryStringParameters.user;
   let token = "";
+  console.log('get-webex-token: user ' + user)
 
   if (user && user.toLowerCase() === 'user2') {
     token = getUser2AccessToken();
@@ -14,8 +15,10 @@ exports.handler = async (event) => {
     token = getUser1AccessToken();
   }
 
+  console.log('get-webex-token: token ' + token)
+
   return {
     statusCode: 200,
-    body: token,
+    body: "" + token,
   };
 };
