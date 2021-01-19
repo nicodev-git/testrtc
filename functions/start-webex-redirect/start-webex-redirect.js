@@ -31,22 +31,29 @@ exports.handler = async (event) => {
   console.log(`start-webex-redirect:state ` + state);
   return await axios(axiosConfig)
     .then((res) => {
-      console.log(`statusCode: ${res.statusCode}`)
+      console.log(`statusCode: ${res.status}`)
       console.log(res)
 
-      if (state && state.toLowerCase() === 'user2') {
-        saveUser1AccessToken(res.access_token);
-        saveUser1RefreshToken(res.refresh_token);
-      } else {
-        saveUser2AccessToken(res.access_token);
-        saveUser2RefreshToken(res.refresh_token);
-      }
+      if (res.status == 200) {
+        if (state && state.toLowerCase() === 'user2') {
+          saveUser1AccessToken(res.data.access_token);
+          saveUser1RefreshToken(res.data.refresh_token);
+        } else {
+          saveUser2AccessToken(res.data.access_token);
+          saveUser2RefreshToken(res.data.refresh_token);
+        }
 
-      return {
-        statusCode: 302,
-        body: "",
-        headers: {
-          location: "/webex-login.html"
+        return {
+          statusCode: 302,
+          body: "",
+          headers: {
+            location: "/webex-login.html"
+          }
+        }
+      } else {
+        return {
+          statusCode: 500,
+          body: JSON.stringify(res)
         }
       }
     })
