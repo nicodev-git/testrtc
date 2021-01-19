@@ -38,7 +38,7 @@ exports.handler = async (event) => {
       console.log(res)
 
       if (res.status == 200) {
-        if (state && state.toLowerCase() === 'user2') {
+        if (user && user.toLowerCase() === 'user2') {
           console.log('user2 access token: ' + res.data.access_token)
           saveUser2AccessToken(res.data.access_token);
           saveUser2RefreshToken(res.data.refresh_token);
