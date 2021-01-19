@@ -27,7 +27,7 @@ exports.handler = async (event) => {
     },
     data: data
   };
-  return axios(axiosConfig)
+  return await axios(axiosConfig)
     .then((res) => {
       console.log(`statusCode: ${res.statusCode}`)
       //console.log(res)
