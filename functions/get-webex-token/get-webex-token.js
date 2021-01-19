@@ -1,24 +1,27 @@
-const { getUser1AccessToken } = require("../save-webex-token/redis-connection");
+const { getUser1AccessToken, getUser2AccessToken, getUser1RefreshToken, getUser2RefreshToken } = require("../save-webex-token/redis-connection");
 var Webex = require('webex');
 const assert = require(`assert`);
 const config = require('./server-config.js')
 
 exports.handler = async (event) => {
   const user = event.queryStringParameters.user;
-  let token = "";
+  let accessToken = "";
+  let refreshToken = "";
   console.log('get-webex-token: user ' + user)
 
   if (user && user.toLowerCase() === 'user2') {
-    token = await getUser2AccessToken();
+    accessToken = await getUser2AccessToken();
+    refreshToken = await getUser2RefreshToken();
   } else {
     // Defaulting to user 1
-    token = await getUser1AccessToken();
+    accessToken = await getUser1AccessToken();
+    refreshToken = await getUser1RefreshToken();
   }
 
-  console.log('get-webex-token: token ' + token)
+  console.log('get-webex-token: token ' + accessToken)
 
   return {
     statusCode: 200,
-    body: token,
+    body: JSON.stringify({ accessToken, refreshToken }),
   };
 };
