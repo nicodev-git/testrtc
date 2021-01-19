@@ -11,25 +11,16 @@ async function saveToken() {
 }
 
 function userLogin(user) {
+  console.log(`webex-login:started`);
   console.log(config.authUrl)
   var webex = Webex.init({
     config: {
       credentials: {
         authorizationString: config.authUrl+"&state="+user,
-        clientType: 'confidential',
-        refreshCallback: function(webex, token) {
-          return fetch(`.netlify/functions/refresh-webex-token`, {
-            method: `POST`,
-            body: JSON.stringify({
-              refresh_token: token.refresh_token
-            })
-          })
-          .then((res) => res.json())
-        }
+        clientType: 'confidential'
       }
     }
   });
-  console.log(`webex-login:started`);
 
   webex.once(`ready`, function () {
   console.log(`webex-login:ready`);
@@ -48,10 +39,12 @@ function start() {
     saveToken();
   };
   document.getElementById("user1-login").onclick = function () {
-    userLogin('user1');
+    window.location.replace("https://webex-playground.netlify.app/.netlify/functions/start-webex-login?user=user1");
+    //userLogin('user1');
   };
   document.getElementById("user2-login").onclick = function () {
-    userLogin('user2');
+    //userLogin('user2');
+    window.location.replace("https://webex-playground.netlify.app/.netlify/functions/start-webex-login?user=user2");
   };
   console.log(`webex-login:start`);
 }

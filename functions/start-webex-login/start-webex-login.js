@@ -4,6 +4,7 @@ const assert = require(`assert`);
 const config = require('../get-webex-token/server-config.js')
 
 exports.handler = async (event) => {
+  const user = event.queryStringParameters.user;
 
   console.log(`start-webex-login:handler`);
 
@@ -19,6 +20,8 @@ exports.handler = async (event) => {
 
   await webex.once(`ready`);
   let url = await webex.credentials.buildLoginUrl({ clientType: 'confidential' })
+  url += url+"&state="+(user?user:'user1')
+  console.log('start-webex-login:url ' + url)
   return {
     statusCode: 302,
     body: "",
