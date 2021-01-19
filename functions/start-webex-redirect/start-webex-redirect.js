@@ -27,12 +27,14 @@ exports.handler = async (event) => {
     },
     data: data
   };
+  console.log(`start-webex-redirect:code ` + code);
+  console.log(`start-webex-redirect:state ` + state);
   return await axios(axiosConfig)
     .then((res) => {
       console.log(`statusCode: ${res.statusCode}`)
-      //console.log(res)
+      console.log(res)
 
-      if (state.toLowerCase() === 'user2') {
+      if (state && state.toLowerCase() === 'user2') {
         saveUser1AccessToken(res.access_token);
         saveUser1RefreshToken(res.refresh_token);
       } else {
