@@ -1,7 +1,4 @@
 const { getUser1AccessToken, getUser2AccessToken, getUser1RefreshToken, getUser2RefreshToken } = require("../save-webex-token/redis-connection");
-var Webex = require('webex');
-const assert = require(`assert`);
-const config = require('./server-config.js')
 
 exports.handler = async (event) => {
   const user = event.queryStringParameters.user;

@@ -1,5 +1,5 @@
 var Webex = require('webex');
-const config = require('../get-webex-token/server-config.js')
+const authUrl = process.env.WEBEX_AUTH_URL || "";
 
 exports.handler = async (event) => {
   const user = event.queryStringParameters.user;
@@ -9,7 +9,7 @@ exports.handler = async (event) => {
   var webex = Webex.init({
     config: {
       credentials: {
-        authorizationString: config.authUrl
+        authorizationString: authUrl
       }
     }
   });
