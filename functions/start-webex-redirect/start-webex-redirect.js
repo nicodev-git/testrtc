@@ -2,7 +2,9 @@ const { saveUser1AccessToken, saveUser2AccessToken, saveUser1RefreshToken, saveU
 const assert = require(`assert`);
 const axios = require('axios')
 var querystring = require('querystring');
-const config = require('../get-webex-token/server-config.js')
+const clientId = process.env.WEBEX_CLIENT_ID || "";
+const clientSecret = process.env.WEBEX_CLIENT_SECRET || "";
+const redirectUri = process.env.WEBEX_REDIRECT_URI || "";
 
 exports.handler = async (event) => {
   const code = event.queryStringParameters.code;
@@ -13,10 +15,10 @@ exports.handler = async (event) => {
 
   var data = querystring.stringify({
     grant_type: 'authorization_code',
-    client_id: config.clientId,
-    client_secret: config.clientSecret,
+    client_id: clientId,
+    client_secret: clientSecret,
     code,
-    redirect_uri: config.redirectUri
+    redirect_uri: redirectUri
   });
   var axiosConfig = {
     method: 'post',

@@ -35,9 +35,10 @@ https://twilio-playground.netlify.app/.netlify/functions/refresh-webex-token
         meeting:participants_write
         spark:all
         identity:placeonetimepassword_create
-3. Save the following information in **get-webex-token/server-config.js**
-    clientId
-    clientSecret
-    redirectUri
-    authUrl - final "OAuth Authorization URL"
+3. Save the following information env variables
+    WEBEX_AUTH_URL - final "OAuth Authorization URL"
+    WEBEX_CLIENT_ID
+    WEBEX_CLIENT_SECRET
+    WEBEX_REDIRECT_URI
+    
 4. Based on netlify URL update the login URL in **src/webex-login.js**

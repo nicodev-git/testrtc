@@ -1,7 +1,8 @@
 const { saveUser1AccessToken, saveUser1RefreshToken, getUser1RefreshToken, saveUser2AccessToken, saveUser2RefreshToken, getUser2RefreshToken } = require("../save-webex-token/redis-connection");
 const axios = require('axios')
 var querystring = require('querystring');
-const config = require('../get-webex-token/server-config.js')
+const clientId = process.env.WEBEX_CLIENT_ID || "";
+const clientSecret = process.env.WEBEX_CLIENT_SECRET || "";
 
 // this will be called from CRON
 exports.handler = async (event) => {
@@ -18,8 +19,8 @@ exports.handler = async (event) => {
 
   var data = querystring.stringify({
     grant_type: 'refresh_token',
-    client_id: config.clientId,
-    client_secret: config.clientSecret,
+    client_id: clientId,
+    client_secret: clientSecret,
     refresh_token: refreshToken
   });
   var axiosConfig = {
