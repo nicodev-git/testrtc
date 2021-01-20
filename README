@@ -40,5 +40,11 @@ https://twilio-playground.netlify.app/.netlify/functions/refresh-webex-token
     WEBEX_CLIENT_ID
     WEBEX_CLIENT_SECRET
     WEBEX_REDIRECT_URI
-    
+
 4. Based on netlify URL update the login URL in **src/webex-login.js**
+
+5. Generate 2 tokens
+open https://twilio-playground.netlify.app/webex-login.html
+
+user1: muly@testrtc.com
+user2: TBD, right now use Mahesh webex account
