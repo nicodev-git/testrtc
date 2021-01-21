@@ -48,3 +48,6 @@ open https://twilio-playground.netlify.app/webex-login.html
 
 user1: muly@testrtc.com
 user2: TBD, right now use Mahesh webex account
+
+6. Schedule cron once a week to refresh token
+https://console.cloud.google.com/cloudscheduler?authuser=1&project=testrtc-prod
