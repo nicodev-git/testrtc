@@ -11,10 +11,10 @@
 
 [[redirects]]
   from = "/ably-auth/*"
-  to = "/.netlify/functions/get-ably-auth/auth"
+  to = "/.netlify/functions/get-ably-auth"
   status = 302
 
 [[redirects]]
   from = "/ably-getCredentials/*"
-  to = "/.netlify/functions/get-ably-auth/getCredentials"
+  to = "/.netlify/functions/get-ably-credentials"
   status = 302
