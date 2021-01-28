@@ -8,3 +8,13 @@
   to = "/.netlify/functions/get-token?identity=:identity&roomName=:roomName"
   query = {identity = ":identity", roomName = ":roomName"}
   status = 302
+
+[[redirects]]
+  from = "/ably-auth/*"
+  to = "/.netlify/functions/get-ably-auth/auth"
+  status = 302
+
+[[redirects]]
+  from = "/ably-getCredentials/*"
+  to = "/.netlify/functions/get-ably-auth/getCredentials"
+  status = 302
