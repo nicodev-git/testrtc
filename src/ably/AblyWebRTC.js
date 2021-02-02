@@ -57,6 +57,7 @@ class AblyWebRTC extends EventEmitter {
 
   createPeerConnection(rtcRoomId) {
     const queryParams = utils.getQueryParameters();
+    console.log(queryParams)
     const config = {
       iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
       watchrtc: {

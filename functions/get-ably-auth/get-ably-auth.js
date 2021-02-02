@@ -2,7 +2,6 @@ const Ably = require("ably");
 const ably = new Ably.Rest({ key: process.env.ABLY_KEY });
 
 exports.handler = async () => {
-  console.log("Ably Key: " + process.env.ABLY_KEY)
   const tokenParams = {};
 
   try {

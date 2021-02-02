@@ -6,6 +6,9 @@ const utils = require("./utils");
 const params = utils.getQueryParameters();
 const watchrtcEnabled = params.watchrtc === "true";
 
+console.log("params")
+console.log(params)
+
 if (watchrtcEnabled) {
   require("watchrtc.js")();
 }
