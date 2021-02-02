@@ -8,4 +8,21 @@ function getQueryParameters() {
   return result;
 }
 
+async function getConnectionInfo(connectionInfoUrl, connectionName) {
+  try {
+    const data = {
+      connectionName,
+    };
+
+    const response = await axios.post(
+      `${connectionInfoUrl}/connectionInfo`,
+      data
+    );
+    return response.data;
+  } catch (err) {
+    throw new Error("Failed to get connection info");
+  }
+}
+
 exports.getQueryParameters = getQueryParameters;
+exports.getConnectionInfo = getConnectionInfo;

@@ -57,9 +57,11 @@ class AblyWebRTC extends EventEmitter {
 
   createPeerConnection(rtcRoomId) {
     const queryParams = utils.getQueryParameters();
-    console.log(queryParams)
+    const account = queryParams.account;
+    const turnServers = getTestCredentials(account);
+
     const config = {
-      iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+      iceServers: turnServers,
       watchrtc: {
         rtcApiKey:
           queryParams.rtcApiKey || "e39c1b92-a6ca-4486-83db-1cf15c63cde8",
@@ -85,6 +87,36 @@ class AblyWebRTC extends EventEmitter {
   ontrack(e) {
     this.emit("track", e);
   }
+}
+
+async function getTestCredentials(account) {
+  const connectionInfoUrl = process.env.CONNECTION_INFO_URL
+  let result;
+
+  if (!account && account != 'none') {
+    result = await utils.getConnectionInfo(connectionInfoUrl, account);
+  }
+
+  if (result.testCredentials) {
+    turnServers = result.testCredentials
+  } else if (account === 'twilio') {
+  } else if (account === 'opentok') {
+
+  } else if (account === 'avatour') {
+
+  } else {
+    // Unknown or no account provided, using default
+    // turnServers = [{ urls: "stun:stun.l.google.com:19302" }];
+    turnServers = [
+      {
+        username: result.username,
+        credential: result.credential,
+        urls: result.turnServers,
+      },
+    ];
+  }
+
+  return turnServers;
 }
 
 module.exports = AblyWebRTC;
