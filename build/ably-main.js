@@ -16489,7 +16489,7 @@ async function getTestCredentials(account) {
     result = await utils.getConnectionInfo(connectionInfoUrl, account);
   }
 
-  if (result.testCredentials) {
+  if (result && result.testCredentials) {
     turnServers = result.testCredentials
   } else if (account === 'twilio') {
   } else if (account === 'opentok') {
