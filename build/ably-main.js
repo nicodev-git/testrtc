@@ -86949,11 +86949,15 @@ async function getConnectionInfo(connectionInfoUrl, connectionName) {
     const data = {
       connectionName,
     };
+    console.log("ConnectionInfoUrl: " + connectionInfoUrl);
 
     const response = await axios.post(
       `${connectionInfoUrl}/connectionInfo`,
       data
     );
+
+    console.log("ConnectionInfo response: " + JSON.stringify(response));
+
     return response.data;
   } catch (err) {
     throw new Error("Failed to get connection info");
@@ -86963,4 +86967,4 @@ async function getConnectionInfo(connectionInfoUrl, connectionName) {
 exports.getQueryParameters = getQueryParameters;
 exports.getConnectionInfo = getConnectionInfo;
 
-},{}]},{},[11,12,13]);
+},{}]},{},[11,12,14,13]);
