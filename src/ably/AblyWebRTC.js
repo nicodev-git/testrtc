@@ -95,6 +95,8 @@ async function getTestCredentials(account) {
   let result;
   let iceServers = [];
 
+  console.log("account - " + account)
+
   if (!account && account != 'none') {
     result = await utils.getConnectionInfo(connectionInfoUrl, account);
   }
@@ -118,6 +120,9 @@ async function getTestCredentials(account) {
     // No account name provided, using default ice servers
     iceServers = [{ urls: "stun:stun.l.google.com:19302" }];
   }
+
+  console.log("iceServers")
+  console.log(iceServers)
 
   return iceServers;
 }
