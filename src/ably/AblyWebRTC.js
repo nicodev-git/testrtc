@@ -98,7 +98,11 @@ async function getTestCredentials(account) {
   console.log("account - " + account)
 
   if (!account && account != 'none') {
-    result = await utils.getConnectionInfo(connectionInfoUrl, account);
+    if (account === 'opentok') {
+      result = await utils.getConnectionInfo(connectionInfoUrl, "tokbox");
+    } else {
+      result = await utils.getConnectionInfo(connectionInfoUrl, account);
+    }
   }
 
   if (result && result.testCredentials) {
