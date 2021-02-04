@@ -91,7 +91,7 @@ class AblyWebRTC extends EventEmitter {
 }
 
 async function getTestCredentials(account) {
-  const connectionInfoUrl = 'https:///api.nettest.testrtc.com';
+  const connectionInfoUrl = 'https://api.nettest.testrtc.com';
   let result;
   let iceServers = [];
 
@@ -100,6 +100,8 @@ async function getTestCredentials(account) {
   if (account && account != 'none') {
     if (account === 'opentok') {
       result = await utils.getConnectionInfo(connectionInfoUrl, "tokbox");
+    } else if (account === 'twilio') {
+      result = await utils.getConnectionInfo(connectionInfoUrl, "twilio-testrtc-video");
     } else {
       result = await utils.getConnectionInfo(connectionInfoUrl, account);
     }
@@ -107,11 +109,8 @@ async function getTestCredentials(account) {
 
   if (result && result.testCredentials) {
     iceServers = result.testCredentials
-  } else if (account === 'twilio') {
   } else if (account === 'opentok') {
     iceServers = await opentok.getTokboxIceServers(result);
-  } else if (account === 'avatour') {
-
   } else if (result) {
     iceServers = [
       {
