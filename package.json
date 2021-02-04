@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "deploy": "netlify deploy --prod --dir=build --site=0db468d8-46bf-4488-a322-6a8b2f661aae",
-    "build": "browserify src/main.js -o build/main.js && browserify src/webex-login.js -o build/webex-login.js && browserify src/ably/main.js -o build/ably-main.js && browserify src/ably/opentok.js -o build/ably-main.js",
+    "build": "browserify src/main.js -o build/main.js && browserify src/webex-login.js -o build/webex-login.js && browserify src/ably/AblyWebRTC.js src/ably/main.js src/ably/opentok.js -o build/ably-main.js",
     "test": "eslint server.js src/",
     "start": "npm run build && node server",
     "dev": "env-cmd npm run start"
