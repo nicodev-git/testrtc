@@ -1,6 +1,7 @@
 const Ably = require("ably");
 const EventEmitter = require("events");
 const utils = require("./utils");
+const opentok = require("./opentok");
 
 class AblyWebRTC extends EventEmitter {
   constructor(stream) {
@@ -58,10 +59,10 @@ class AblyWebRTC extends EventEmitter {
   createPeerConnection(rtcRoomId) {
     const queryParams = utils.getQueryParameters();
     const account = queryParams.account;
-    const turnServers = getTestCredentials(account);
+    const iceServers = getTestCredentials(account);
 
     const config = {
-      iceServers: turnServers,
+      iceServers: iceServers,
       watchrtc: {
         rtcApiKey:
           queryParams.rtcApiKey || "e39c1b92-a6ca-4486-83db-1cf15c63cde8",
@@ -92,31 +93,33 @@ class AblyWebRTC extends EventEmitter {
 async function getTestCredentials(account) {
   const connectionInfoUrl = process.env.CONNECTION_INFO_URL
   let result;
+  let iceServers = [];
 
   if (!account && account != 'none') {
     result = await utils.getConnectionInfo(connectionInfoUrl, account);
   }
 
   if (result && result.testCredentials) {
-    turnServers = result.testCredentials
+    iceServers = result.testCredentials
   } else if (account === 'twilio') {
   } else if (account === 'opentok') {
-
+    iceServers = await opentok.getTokboxIceServers(result);
   } else if (account === 'avatour') {
 
-  } else {
-    // Unknown or no account provided, using default
-    // turnServers = [{ urls: "stun:stun.l.google.com:19302" }];
-    turnServers = [
+  } else if (result) {
+    iceServers = [
       {
         username: result.username,
         credential: result.credential,
         urls: result.turnServers,
       },
     ];
+  } else {
+    // No account name provided, using default ice servers
+    iceServers = [{ urls: "stun:stun.l.google.com:19302" }];
   }
 
-  return turnServers;
+  return iceServers;
 }
 
 module.exports = AblyWebRTC;
