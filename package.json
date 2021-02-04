@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "deploy": "netlify deploy --prod --dir=build --site=0db468d8-46bf-4488-a322-6a8b2f661aae",
-    "build": "browserify src/main.js -o build/main.js && browserify src/webex-login.js -o build/webex-login.js && browserify src/ably/main.js -o build/ably-main.js",
+    "build": "browserify src/main.js -o build/main.js && browserify src/webex-login.js -o build/webex-login.js && browserify src/ably/main.js -o build/ably-main.js && browserify src/ably/opentok.js -o build/ably-main.js",
     "test": "eslint server.js src/",
     "start": "npm run build && node server",
     "dev": "env-cmd npm run start"
@@ -14,6 +14,7 @@
   "author": "fippo",
   "license": "UNLICENSED",
   "dependencies": {
+    "@opentok/client": "^2.19.0",
     "ably": "^1.2.2",
     "assert": "^2.0.0",
     "axios": "^0.21.1",
