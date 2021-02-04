@@ -91,7 +91,7 @@ class AblyWebRTC extends EventEmitter {
 }
 
 async function getTestCredentials(account) {
-  const connectionInfoUrl = process.env.CONNECTION_INFO_URL
+  const connectionInfoUrl = 'https:///api.nettest.testrtc.com';
   let result;
   let iceServers = [];
 
