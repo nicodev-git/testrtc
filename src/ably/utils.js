@@ -1,3 +1,5 @@
+const axios = require("axios");
+
 function getQueryParameters() {
   const result = {};
   const items = location.search.substr(1).split("&");
