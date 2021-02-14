@@ -88433,7 +88433,7 @@ async function getTestCredentials(account) {
     if (account === 'opentok') {
       result = await utils.getConnectionInfo(connectionInfoUrl, "tokbox");
     } else if (account === 'twilio') {
-      result = await utils.getConnectionInfo(connectionInfoUrl, "twilio-testrtc-video");
+      result = await utils.getConnectionInfo(connectionInfoUrl, "twilio-testrtc-account");
     } else {
       result = await utils.getConnectionInfo(connectionInfoUrl, account);
     }
