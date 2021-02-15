@@ -56,3 +56,28 @@ https://console.cloud.google.com/cloudscheduler?authuser=1&project=testrtc-prod
 
 # Ably Integration
 Set environment variable "ABLY_KEY" with the key obtained from https://www.ably.io/
+
+
+# Agora
+
+https://docs.agora.io/en/faq/API%20Reference/web/index.html
+
+https://docs.agora.io/en/faq/API%20Reference/web/interfaces/agorartc.client.html#enabledualstream
+-- simulcast? Test!
+
+https://docs.agora.io/en/Video/start_call_web?platform=Web
+
+certificate:
+    43102875d3094e52b909fa0084a7326e
+
+
+instead of simulcast:
+    https://github.com/AgoraIO/Basic-Video-Call/blob/master/Group-Video/OpenVideoCall-Web/src/pages/meeting/meeting.js#L117
+
+
+
+# Sample Call
+https://agora-playground.netlify.app/.netlify/functions/get-token?identity=6e68500b-4fe2-478a-82ad-4a683d76940c&roomName=room
+
+Right now must add parameters identity and roomName
+to control parameters list see netlify.toml line 8 and 9
