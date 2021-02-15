@@ -1,0 +1,29 @@
+#remotes>div {
+    width: 25%;
+    height: fit-content;
+    float: left;
+}
+
+.video-bar {
+    float: right;
+    width: 25%;
+    height: fit-content;
+}
+
+#localScreenContainer,
+#localVideoContainer {
+    width: 100%;
+}
+
+#remotes video,
+#localScreenContainer video,
+#localVideoContainer video {
+    width: 100%;
+    position: relative !important;
+    object-fit: contain !important;
+    height: auto !important;
+}
+
+#localVideoContainer video{
+    transform: scale(-1, 1);
+}

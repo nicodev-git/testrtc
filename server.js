@@ -3,9 +3,10 @@ const app = express();
 const path = require('path');
 
 const  { getTwilioToken } = require("./functions/get-token/get-twilio-token");
+const { getAgoraToken } = require("./functions/get-token-agora/get-agora-token");
 
 const Ably = require("ably");
-const ably = new Ably.Rest({ key: process.env.ABLY_KEY });
+const ably = new Ably.Rest({ key: process.env.ABLY_KEY ? process.env.ABLY_KEY : '9cDWkA.TWPRGg:uSGzxxldE2KeRWNS'});
 
 app.use(express.static(path.join(__dirname, 'build')));
 
@@ -25,6 +26,15 @@ app.get("/ably-auth", (req, res) => {
   });
 });
 
+app.get("/agora-token", async (req, res) => {
+  res.send(await getAgoraToken(req.query));
+});
+
 app.get('*', (_, res) => res.sendFile(path.join(__dirname, 'build/index.html')));
+
+
+
+
+
 
 app.listen(8081, () => console.log('token server running on 8081'));
