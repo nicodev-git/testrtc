@@ -1,0 +1,8 @@
+video {
+    width: 320px;
+    height: 180px;
+}
+
+#localVideoContainer>video{
+    transform: scale(-1, 1);
+}

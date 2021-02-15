@@ -51,3 +51,8 @@ user2: TBD, right now use Mahesh webex account
 
 6. Schedule cron once a week to refresh token
 https://console.cloud.google.com/cloudscheduler?authuser=1&project=testrtc-prod
+
+
+
+# Ably Integration
+Set environment variable "ABLY_KEY" with the key obtained from https://www.ably.io/
