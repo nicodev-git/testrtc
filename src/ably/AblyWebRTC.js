@@ -50,16 +50,16 @@ class AblyWebRTC extends EventEmitter {
 
   async call(otherId) {
     this.otherChannel = this.ably.channels.get(otherId);
-    this.createPeerConnection(otherId);
+    await this.createPeerConnection(otherId);
     const offer = await this.pc.createOffer();
     this.otherChannel.publish("offer", JSON.parse(JSON.stringify(offer)));
     this.pc.setLocalDescription(offer);
   }
 
-  createPeerConnection(rtcRoomId) {
+  async createPeerConnection(rtcRoomId) {
     const queryParams = utils.getQueryParameters();
     const account = queryParams.account;
-    const iceServers = getTestCredentials(account);
+    const iceServers = await getTestCredentials(account);
 
     const config = {
       iceServers: iceServers,
@@ -91,25 +91,28 @@ class AblyWebRTC extends EventEmitter {
 }
 
 async function getTestCredentials(account) {
-  const connectionInfoUrl = 'https://api.nettest.testrtc.com/access';
+  const connectionInfoUrl = "https://api.nettest.testrtc.com/access";
   let result;
   let iceServers = [];
 
-  console.log("account - " + account)
+  console.log("account - " + account);
 
-  if (account && account != 'none') {
-    if (account === 'opentok') {
+  if (account && account != "none") {
+    if (account === "opentok") {
       result = await utils.getConnectionInfo(connectionInfoUrl, "tokbox");
-    } else if (account === 'twilio') {
-      result = await utils.getConnectionInfo(connectionInfoUrl, "twilio-testrtc-account");
+    } else if (account === "twilio") {
+      result = await utils.getConnectionInfo(
+        connectionInfoUrl,
+        "twilio-testrtc-account"
+      );
     } else {
       result = await utils.getConnectionInfo(connectionInfoUrl, account);
     }
   }
 
   if (result && result.testCredentials) {
-    iceServers = result.testCredentials
-  } else if (account === 'opentok') {
+    iceServers = result.testCredentials;
+  } else if (account === "opentok") {
     iceServers = await opentok.getTokboxIceServers(result);
   } else if (result) {
     iceServers = [
@@ -124,8 +127,8 @@ async function getTestCredentials(account) {
     iceServers = [{ urls: "stun:stun.l.google.com:19302" }];
   }
 
-  console.log("iceServers")
-  console.log(iceServers)
+  console.log("iceServers");
+  console.log(iceServers);
 
   return iceServers;
 }

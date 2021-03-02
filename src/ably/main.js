@@ -22,7 +22,18 @@ navigator.mediaDevices
       console.log("connected!", ably.connection.id);
       window.location.hash = ably.connection.id;
       if (initialHash.length) {
-        ably.call(initialHash);
+        ably
+          .call(initialHash)
+          .then(() => {
+            console.log(
+              `ably call returned initialHash:${initialHash} id:${ably.connection.id}`
+            );
+          })
+          .catch((err) => {
+            console.errlr(`ably call error ${err.message}}`, {
+              err: err.stack,
+            });
+          });
       }
     });
     ably.on("track", (e) => {
