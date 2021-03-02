@@ -71,6 +71,7 @@ class AblyWebRTC extends EventEmitter {
       },
     };
 
+    console.log(`AblyWebRTC:createPeerConnection`, { config, account });
     this.pc = new RTCPeerConnection(config);
     this.pc.addEventListener("icecandidate", this.onicecandidate.bind(this));
     this.pc.addEventListener("track", this.ontrack.bind(this));
