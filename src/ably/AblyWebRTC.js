@@ -16,36 +16,43 @@ class AblyWebRTC extends EventEmitter {
       // Subscribe to our channel.
       this.myChannel = this.ably.channels.get(this.connection.id);
       this.myChannel.subscribe((message) => {
-        console.log("GOT", message.name, message);
-        if (message.name === "offer" && !this.pc) {
-          this.otherChannel = this.ably.channels.get(message.connectionId);
-          this.createPeerConnection(this.connection.id);
-        } else if (!this.pc) {
-          console.log("missing peerconnection");
-          return;
-        }
-        switch (message.name) {
-          case "offer":
-            this.pc
-              .setRemoteDescription(message.data)
-              .then(() => this.pc.createAnswer())
-              .then((answer) => this.pc.setLocalDescription(answer))
-              .then(() => {
-                this.otherChannel.publish(
-                  "answer",
-                  JSON.parse(JSON.stringify(this.pc.localDescription))
-                );
-              });
-            break;
-          case "answer":
-            this.pc.setRemoteDescription(message.data);
-            break;
-          case "candidate":
-            this.pc.addIceCandidate(message.data);
-            break;
-        }
+        this.handleMessage(message).catch((err) => {
+          console.error(`muly:AblyWebRTC:Got Message ${err.message}`, {
+            err: err.stack,
+          });
+        });
       });
     });
+  }
+
+  async handleMessage(message) {
+    console.log("GOT", message.name, message);
+    if (message.name === "offer" && !this.pc) {
+      this.otherChannel = this.ably.channels.get(message.connectionId);
+      await this.createPeerConnection(this.connection.id);
+    } else if (!this.pc) {
+      console.log("missing peerconnection");
+      return;
+    }
+
+    let answer;
+    switch (message.name) {
+      case "offer":
+        await this.pc.setRemoteDescription(message.data);
+        answer = await this.pc.createAnswer();
+        await this.pc.setLocalDescription(answer);
+        this.otherChannel.publish(
+          "answer",
+          JSON.parse(JSON.stringify(this.pc.localDescription))
+        );
+        break;
+      case "answer":
+        this.pc.setRemoteDescription(message.data);
+        break;
+      case "candidate":
+        this.pc.addIceCandidate(message.data);
+        break;
+    }
   }
 
   async call(otherId) {
